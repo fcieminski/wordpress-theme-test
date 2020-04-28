@@ -2,8 +2,13 @@
     <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
 
             <?php
-            the_content();
-            $name = get_the_author_meta('first_name')
+            $gallery = get_post_gallery($post, false);
+            foreach ($gallery['src'] as $src) {
+            ?>
+                <img src="<?php echo $src; ?>" class="my-custom-class" alt="Gallery image" />
+            <?php
+            }
+            $name = get_the_author_meta('first_name');
             ?>
             <p>Opublikowane przez <?php echo $name ?>, <?php the_date() ?> </p>
             <?php

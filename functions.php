@@ -34,9 +34,64 @@ add_image_size('blog-small', 300, 200, true);
 
 register_sidebar([
     'name' => 'Blog Sidebar',
-    'id' => 'blog-sidebar'
+    'id' => 'blog-sidebar',
+    'before_title' => '<h4 class="widget--title">',
+    'after_title' => '</h4>'
 ]);
 register_sidebar([
     'name' => 'Page Sidebar',
-    'id' => 'page-sidebar'
+    'id' => 'page-sidebar',
+    'before_title' => '<h4 class="widget--title">',
+    'after_title' => '</h4>'
 ]);
+
+
+function first_post_type()
+{
+
+    $args = [
+        'hierarchical' => true,
+        'public' => true,
+        'has_archive' => true,
+        'supports' => ['title', 'editor', 'thumbnail'],
+        'rewrite' => ['slug' => 'post-gallery'],
+        'menu_icon' => 'dashicons-megaphone',
+        'labels' => ['name' => 'Galeria']
+    ];
+    register_post_type('gallery', $args);
+}
+add_action('init', 'first_post_type');
+
+function my_taxonomy()
+{
+    $args = [
+        'labels' => [
+            'name' => 'Images',
+            'singular_name' => 'Image'
+        ],
+        'public' => true,
+        'hierarchical' => true,
+    ];
+    register_taxonomy('images', ['gallery'], $args);
+}
+add_action('init', 'my_taxonomy');
+
+
+function customFormatGallery($string, $attr)
+{
+
+    $output = "<div id=\"container\">";
+    $posts = get_posts(array('include' => $attr['ids'], 'post_type' => 'attachment'));
+
+    foreach ($posts as $imagePost) {
+        $output .= "<div src='" . wp_get_attachment_image_src($imagePost->ID, 'small')[0] . "'>";
+        $output .= "<div src='" . wp_get_attachment_image_src($imagePost->ID, 'medium')[0] . "' data-media=\"(min-width: 400px)\">";
+        $output .= "<div src='" . wp_get_attachment_image_src($imagePost->ID, 'large')[0] . "' data-media=\"(min-width: 950px)\">";
+        $output .= "<div src='" . wp_get_attachment_image_src($imagePost->ID, 'extralarge')[0] . "' data-media=\"(min-width: 1200px)\">";
+    }
+
+    $output .= "</div>";
+
+    return $output;
+}
+add_filter('post_gallery', 'customFormatGallery', 10, 2);
