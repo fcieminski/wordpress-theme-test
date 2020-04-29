@@ -1,7 +1,7 @@
 <?php
 function load_css()
 {
-    wp_register_style('style', get_template_directory_uri() . '/style.css');
+    wp_register_style('style', get_template_directory_uri() . '/dist/index.css');
     wp_enqueue_style('style');
 }
 add_action('wp_enqueue_scripts', 'load_css');
@@ -9,7 +9,7 @@ add_action('wp_enqueue_scripts', 'load_css');
 
 function load_js()
 {
-    wp_register_script('script', get_template_directory_uri() . '/script.js', 'javascript', false, true);
+    wp_register_script('script', get_template_directory_uri() . '/dist/app.js', 'javascript', false, true);
     wp_enqueue_script('script');
 }
 add_action('wp_enqueue_scripts', 'load_js');
@@ -53,7 +53,7 @@ function first_post_type()
         'hierarchical' => true,
         'public' => true,
         'has_archive' => true,
-        'supports' => ['title', 'editor', 'thumbnail'],
+        'supports' => ['title', 'editor', 'thumbnail', 'custom-fields'],
         'rewrite' => ['slug' => 'post-gallery'],
         'menu_icon' => 'dashicons-megaphone',
         'labels' => ['name' => 'Galeria']
@@ -75,23 +75,3 @@ function my_taxonomy()
     register_taxonomy('images', ['gallery'], $args);
 }
 add_action('init', 'my_taxonomy');
-
-
-function customFormatGallery($string, $attr)
-{
-
-    $output = "<div id=\"container\">";
-    $posts = get_posts(array('include' => $attr['ids'], 'post_type' => 'attachment'));
-
-    foreach ($posts as $imagePost) {
-        $output .= "<div src='" . wp_get_attachment_image_src($imagePost->ID, 'small')[0] . "'>";
-        $output .= "<div src='" . wp_get_attachment_image_src($imagePost->ID, 'medium')[0] . "' data-media=\"(min-width: 400px)\">";
-        $output .= "<div src='" . wp_get_attachment_image_src($imagePost->ID, 'large')[0] . "' data-media=\"(min-width: 950px)\">";
-        $output .= "<div src='" . wp_get_attachment_image_src($imagePost->ID, 'extralarge')[0] . "' data-media=\"(min-width: 1200px)\">";
-    }
-
-    $output .= "</div>";
-
-    return $output;
-}
-add_filter('post_gallery', 'customFormatGallery', 10, 2);

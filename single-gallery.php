@@ -1,16 +1,28 @@
+<?php get_header(); ?>
 <section>
     <?php if (have_posts()) : while (have_posts()) : the_post(); ?>
 
+            <div>
+                <?php
+                $gallery = get_post_gallery($post->ID, false);
+                foreach ($gallery['src'] as $image) {
+                ?>
+                    <img src="<?php echo $image; ?>" class="my-custom-class" alt="Gallery image" />
+                <?php
+                }
+                ?>
+            </div>
             <?php
-            $gallery = get_post_gallery($post, false);
-            foreach ($gallery['src'] as $src) {
-            ?>
-                <img src="<?php echo $src; ?>" class="my-custom-class" alt="Gallery image" />
-            <?php
-            }
             $name = get_the_author_meta('first_name');
             ?>
             <p>Opublikowane przez <?php echo $name ?>, <?php the_date() ?> </p>
+            <?php if (get_post_meta($post->ID, 'Hawaje', true)) : ?>
+                <ul>
+                    <li>
+                        Hawaje: <?php echo get_post_meta($post->ID, 'Hawaje', true); ?>
+                    </li>
+                </ul>
+            <?php endif ?>
             <?php
             $tags = get_the_tags();
             if ($tags) :
@@ -28,3 +40,4 @@
     <?php endwhile;
     else : endif; ?>
 </section>
+<?php get_footer(); ?>
